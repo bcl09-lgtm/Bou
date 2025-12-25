@@ -102,14 +102,44 @@
 </div>
   <section>
     <h2>معرض الصور: جمال بوحمدان</h2>
-      <button onclick="showGallery()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-   معرض الصور
+      <style>
+  #gallery {
+    display: none; /* مخفي في البداية */
+    margin-top: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    padding: 20px;
+    background: #f4f4f4;
+    border-radius: 10px;
+  }
+  .gallery-img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+</style>
+
+<button onclick="showGallery()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+    فتح معرض الصور
 </button>
 
 <div id="gallery">
-    <img src="photo1.jpg.webp" class="gallery-img"> <img src="photo2.jpg" class="gallery-img">
-    <p>...</p>
+    <img src="photo1.jpg" class="gallery-img"> <img src="photo2.jpg" class="gallery-img">
+    <p>هنا يمكنك إضافة المزيد من الصور...</p>
 </div>
+
+<script>
+  function showGallery() {
+    var x = document.getElementById("gallery");
+    if (x.style.display === "none" || x.style.display === "") {
+      x.style.display = "grid"; // إظهار المعرض
+    } else {
+      x.style.display = "none"; // إخفاؤه عند الضغط مرة أخرى
+    }
+  }
+</script>
+
 
     <div class="gallery">
         <div class="gallery-item">
