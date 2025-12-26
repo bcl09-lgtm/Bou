@@ -179,56 +179,7 @@ function toggleMap() {
         </div>
 </div>
 
-<script type="text/javascript">
-// الإعدادات التي أكدتها أنت
-const CLOUD_NAME = 'merwan';
-const PRESET_NAME = 'bouhamdan';
 
-// 1. كود زر الرفع
-var myWidget = cloudinary.createUploadWidget({
-    cloudName: CLOUD_NAME,
-    uploadPreset: PRESET_NAME,
-    sources: ['local', 'camera'],
-    language: 'ar',
-    text: { ar: { menu: { files: "الصور", camera: "الكاميرا" } } }
-}, (error, result) => {
-    if (!error && result && result.event === "success") {
-        alert('✅ وصلت الصورة بنجاح! ستظهر في المعرض قريباً.');
-        setTimeout(() => { location.reload(); }, 1000); // تحديث الصفحة
-    } else if (error) {
-        console.error("خطأ في الرفع:", error);
-    }
-});
-
-document.getElementById("upload_widget").onclick = () => myWidget.open();
-
-// 2. كود جلب الصور المعتمدة فقط
-function fetchApprovedImages() {
-    // الرابط يجلب الصور التي تحمل أي وسم (Tag) قمت أنت باعتماده
-    fetch(`https://res.cloudinary.com/${CLOUD_NAME}/image/list/bouhamdan_image.json`)
-    .then(response => {
-        if (!response.ok) throw new Error('لا توجد صور معتمدة بعد');
-        return response.json();
-    })
-    .then(data => {
-        const gallery = document.getElementById('gallery');
-        gallery.innerHTML = ''; 
-        data.resources.forEach(img => {
-            const imgUrl = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_400,c_fill,g_auto/v${img.version}/${img.public_id}.${img.format}`;
-            gallery.innerHTML += `
-                <div style="border-radius: 10px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                    <img src="${imgUrl}" style="width:100%; display: block; object-fit: cover; height: 150px;">
-                </div>`;
-        });
-    })
-    .catch(err => {
-        document.getElementById('gallery').innerHTML = '<p style="color:#999;">بانتظار إضافة أول صورة معتمدة...</p>';
-    });
-}
-
-// تشغيل الجلب عند فتح الصفحة
-fetchApprovedImages();
-</script>
       
 
 
@@ -239,7 +190,7 @@ fetchApprovedImages();
 
 <div id="gallery">
     <img src="images (1).webp" class="gallery-img"> <img src="photo2.jpg" class="gallery-img">
-    <p>هنا يمكنك إضافة المزيد من الصور...</p>
+    <p>.</p>
 </div>
 
 <script>
