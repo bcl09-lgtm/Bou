@@ -92,13 +92,35 @@ text-align: center;
         <p>تقع بلدية <strong>بوحمدان</strong> في الجهة الغربية لولاية قالمة، وتتميز بطبيعتها الجبلية الخلابة ومناخها المنعش. تعتبر من المناطق الفلاحية الرائدة في الولاية، وتشتهر بإنتاج الحبوب وتربية المواشي.</p>
     </section>
     <div style="text-align: center; margin: 20px 0;">
-    <button id="toggleBtn" onclick="toggleGallery()" style="padding: 12px 25px; background-color: #007bff; color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-         معرض الصور 📸
+    <div style="text-align: center; margin: 20px 0;">
+    <button id="toggleBtn" onclick="toggleGallery()" style="padding: 12px 25px; background-color: #007bff; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        مشاهدة معرض الصور 📸
     </button>
+
+    <div id="controls" style="display: none; margin-top: 15px; gap: 10px; justify-content: center; align-items: center;">
+        <span style="font-size: 14px;">الصور في السطر:</span>
+        <button onclick="changeGrid(2)" style="padding: 5px 12px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc;">2</button>
+        <button onclick="changeGrid(3)" style="padding: 5px 12px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc;">3</button>
+        <button onclick="changeGrid(4)" style="padding: 5px 12px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc;">4</button>
+    </div>
     
-    <div id="imageGallery" style="display: none; flex-wrap: wrap; gap: 15px; justify-content: center; padding: 20px; background: #f9f9f9; border-radius: 15px; margin-top: 20px;">
+    <div id="imageGallery" style="display: none; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 20px;">
         </div>
+
+    <button id="loadMoreBtn" onclick="displayMoreImages()" style="display: none; margin: 20px auto; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        تحميل المزيد من الصور...
+    </button>
 </div>
+
+<div id="lightbox" style="display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); text-align: center;">
+    <span style="position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; font-weight: bold;" onclick="closeLightbox()">&times;</span>
+    <img id="lightboxImg" style="max-width: 95%; max-height: 75%; margin-top: 60px; border: 2px solid #fff; border-radius: 5px;">
+    <div style="margin-top: 25px;">
+        <button onclick="prevImg()" style="padding: 12px 25px; font-size: 18px; cursor: pointer; background: #444; color: white; border: none; border-radius: 5px; margin: 0 10px;">السابق</button>
+        <button onclick="nextImg()" style="padding: 12px 25px; font-size: 18px; cursor: pointer; background: #444; color: white; border: none; border-radius: 5px; margin: 0 10px;">التالي</button>
+    </div>
+</div>
+
 
     <div style="text-align: center; margin: 30px 0; font-family: Arial, sans-serif;">
     
@@ -214,59 +236,102 @@ function copyLink() {
 <footer>
  " تم إنشاء هذا الموقع من أجل بوحمدان.. موقع مخصص للتعريف بالمؤهلات السياحية الجبلية والمناظر الطبيعية الفريدة في المنطقة."   &copy; 2025
 </footer>
-    <script>
-    let isLoaded = false; // للتأكد من عدم تحميل الصور مرتين
+ <script>
+    let allImages = []; 
+    let displayedCount = 0; 
+    const imagesPerPage = 12; // عدد الصور في كل مرة
+    let currentIndex = 0; 
 
     async function toggleGallery() {
         const galleryDiv = document.getElementById('imageGallery');
+        const controls = document.getElementById('controls');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
         const btn = document.getElementById('toggleBtn');
 
-        // إذا كان المعرض مفتوحاً، نقوم بإغلاقه
-        if (galleryDiv.style.display === 'flex') {
+        if (galleryDiv.style.display === 'grid') {
             galleryDiv.style.display = 'none';
+            controls.style.display = 'none';
+            loadMoreBtn.style.display = 'none';
             btn.innerText = 'مشاهدة معرض الصور 📸';
-            return;
-        }
-
-        // إظهار المعرض
-        galleryDiv.style.display = 'flex';
-        btn.innerText = 'إغلاق المعرض ✖';
-
-        // تحميل الصور فقط إذا لم يتم تحميلها من قبل
-        if (!isLoaded) {
-            galleryDiv.innerHTML = "<p style='width:100%'>جاري جلب الصور من الأرشيف...</p>";
-            
-            try {
-                const response = await fetch(`https://api.github.com/repos/Bcl09-lgtm/bouhamdan/contents/photos`);
-                const files = await response.json();
-                galleryDiv.innerHTML = ""; // مسح رسالة التحميل
-
-                if (Array.isArray(files)) {
-                    // ترتيب من الأحدث إلى الأقدم
-                    files.reverse().forEach(file => {
-                        if (file.name.match(/\.(jpg|jpeg|png|gif)$/i)) {
-                            const img = document.createElement('img');
-                            img.src = file.download_url;
-                            
-                            // تنسيق الصورة لتظهر بشكل مرتب
-                            img.style.width = "180px";
-                            img.style.height = "180px";
-                            img.style.objectFit = "cover";
-                            img.style.borderRadius = "10px";
-                            img.style.border = "2px solid #fff";
-                            img.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
-                            
-                            galleryDiv.appendChild(img);
-                        }
-                    });
-                    isLoaded = true; // تم التحميل بنجاح
-                }
-            } catch (error) {
-                galleryDiv.innerHTML = "<p>تعذر تحميل الصور حالياً.</p>";
-            }
+        } else {
+            galleryDiv.style.display = 'grid';
+            controls.style.display = 'flex';
+            btn.innerText = 'إغلاق المعرض ✖';
+            if (allImages.length === 0) fetchAllImages();
+            else updateLoadMoreButton();
         }
     }
-</script>
+
+    async function fetchAllImages() {
+        const galleryDiv = document.getElementById('imageGallery');
+        galleryDiv.innerHTML = "<p style='grid-column: 1/-1; color: #666;'>جاري جلب الصور...</p>";
+        
+        try {
+            // جلب البيانات من مستودعك
+            const res = await fetch(`https://api.github.com/repos/Bcl09-lgtm/bouhamdan/contents/photos`);
+            const files = await res.json();
+            galleryDiv.innerHTML = "";
+            
+            // تصفية الصور فقط وترتيبها من الأحدث
+            allImages = files.filter(f => f.name.match(/\.(jpg|jpeg|png|gif)$/i)).reverse();
+            displayMoreImages();
+        } catch (e) { 
+            galleryDiv.innerHTML = "<p style='grid-column: 1/-1; color: red;'>حدث خطأ في الاتصال بمجلد الصور.</p>"; 
+        }
+    }
+
+    function displayMoreImages() {
+        const galleryDiv = document.getElementById('imageGallery');
+        const nextBatch = allImages.slice(displayedCount, displayedCount + imagesPerPage);
+        
+        nextBatch.forEach((file, index) => {
+            const actualIndex = displayedCount + index;
+            const img = document.createElement('img');
+            img.src = file.download_url;
+            img.style.cssText = "width:100%; height:180px; object-fit:cover; border-radius:8px; cursor:pointer; background: #ddd;";
+            img.onclick = () => openLightbox(actualIndex);
+            galleryDiv.appendChild(img);
+        });
+
+        displayedCount += nextBatch.length;
+        updateLoadMoreButton();
+    }
+
+    function updateLoadMoreButton() {
+        const btn = document.getElementById('loadMoreBtn');
+        if (btn) {
+            btn.style.display = (displayedCount < allImages.length) ? 'block' : 'none';
+        }
+    }
+
+    function changeGrid(num) {
+        document.getElementById('imageGallery').style.gridTemplateColumns = `repeat(${num}, 1fr)`;
+    }
+
+    function openLightbox(index) {
+        currentIndex = index;
+        document.getElementById('lightbox').style.display = 'block';
+        document.getElementById('lightboxImg').src = allImages[currentIndex].download_url;
+        document.body.style.overflow = 'hidden'; 
+    }
+
+    function closeLightbox() { 
+        document.getElementById('lightbox').style.display = 'none'; 
+        document.body.style.overflow = 'auto';
+    }
+
+    function nextImg() {
+        currentIndex = (currentIndex + 1) % allImages.length;
+        document.getElementById('lightboxImg').src = allImages[currentIndex].download_url;
+    }
+
+    function prevImg() {
+        currentIndex = (currentIndex - 1 + allImages.length) % allImages.length;
+        document.getElementById('lightboxImg').src = allImages[currentIndex].download_url;
+    }
+ </script>
+    
+  
 
   
 
