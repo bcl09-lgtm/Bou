@@ -441,6 +441,59 @@ function copyLink() {
         document.getElementById('lightboxImg').src = allImages[currentIndex].download_url;
     }
  </script>
+    <button id="backToTop" title="العودة للأعلى" style="
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none; /* يختفي في البداية */
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 1000;
+    transition: all 0.3s ease;
+">
+    ↑
+</button>
+
+<script>
+    const backToTopButton = document.getElementById("backToTop");
+
+    // إظهار الزر عند النزول 300 بكسل للأسفل
+    window.onscroll = function() {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            backToTopButton.style.display = "flex";
+            // إضافة حركة ظهور خفيفة
+            backToTopButton.style.opacity = "1";
+        } else {
+            backToTopButton.style.display = "none";
+        }
+    };
+
+    // عند الضغط على الزر، العودة للأعلى بنعومة
+    backToTopButton.onclick = function() {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth" // هذه تجعل الحركة ناعمة وليست مفاجئة
+        });
+    };
+</script>
+
+<style>
+    /* تأثير عند تمرير الماوس فوق الزر */
+    #backToTop:hover {
+        background-color: #0056b3;
+        transform: scale(1.1); /* يكبر قليلاً */
+    }
+</style>
+
     
 
     
