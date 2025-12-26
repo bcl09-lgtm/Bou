@@ -336,7 +336,7 @@ function copyLink() {
             galleryDiv.innerHTML = "<p style='width:100%'>جاري جلب الصور من الأرشيف...</p>";
             
             try {
-                const response = await fetch(`https://api.github.com/repos/Bcl09-lgtm/bohamdan/contents/photos`);
+                const response = await fetch(`https://api.github.com/repos/Bcl09-lgtm/bouhamdan/contents/photos`);
                 const files = await response.json();
                 galleryDiv.innerHTML = ""; // مسح رسالة التحميل
 
