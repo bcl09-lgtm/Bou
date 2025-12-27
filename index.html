@@ -88,6 +88,95 @@ header img, .hero-section img {
 
 </head>
 <body>
+    <header class="hero-section">
+    <div class="announcement-bar">
+        <span>⚠️ الموقع قيد الإنشاء.. انتظروا التحديثات الكبرى قريباً</span>
+    </div>
+
+    <div class="hero-content">
+        <h1 id="typing-text"></h1>
+        <p>جمال الطبيعة في قلب ولاية قالمة</p>
+        <a href="#gallery" class="cta-button">اكتشف الصور</a>
+    </div>
+</header>
+
+<style>
+/* تنسيقات القسم الرئيسي */
+.hero-section {
+    position: relative;
+    height: 100vh; /* يملأ الشاشة بالكامل */
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                url('صورة-المقدمة-الخاصة-بك.jpg'); /* استبدل هذا برابط صورتك */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    font-family: 'Cairo', sans-serif;
+}
+
+/* شريط التنبيه */
+.announcement-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    background: rgba(231, 76, 60, 0.9); /* لون أحمر احترافي */
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    z-index: 10;
+}
+
+/* العنوان مع تأثير الكتابة */
+.hero-content h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+    opacity: 0.9;
+}
+
+/* زر التفاعل */
+.cta-button {
+    padding: 12px 30px;
+    background: #27ae60;
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.cta-button:hover {
+    background: #2ecc71;
+    transform: scale(1.05);
+}
+</style>
+
+<script>
+// تأثير الكتابة الآلية
+const textToType = "مرحباً بكم في بوحمدان الساحرة";
+let i = 0;
+function typeEffect() {
+    if (i < textToType.length) {
+        document.getElementById("typing-text").innerHTML += textToType.charAt(i);
+        i++;
+        setTimeout(typeEffect, 100);
+    }
+}
+// تشغيل التأثير عند تحميل الصفحة
+window.addEventListener('load', typeEffect);
+</script>
+    
 <div style="background-color: #fff3cd; color: #856404; padding: 10px; text-align: center; border: 1px solid #ffeeba;">
     الموقع لا يزال تحت الإنشاء.. انتظروا التحديثات القادمة قريباً! 🚀
 </div>
