@@ -358,6 +358,25 @@ updateWeatherTheme();
     container.onmouseleave = startS;
     container.ontouchstart = stopS;
     container.ontouchend = startS;
+        // --- الجزء المراد إضافته ---
+    window.addEventListener('load', () => {
+        if (typeof fetchAllImages === 'function') {
+            fetchAllImages().then(() => {
+                // إخفاء المعرض فوراً بعد جلب الصور للسلايدر
+                const galleryDiv = document.getElementById('imageGallery');
+                const controls = document.getElementById('controls');
+                const loadMoreBtn = document.getElementById('loadMoreBtn');
+                const btn = document.getElementById('toggleBtn');
+
+                if (galleryDiv) galleryDiv.style.display = 'none';
+                if (controls) controls.style.display = 'none';
+                if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+                if (btn) btn.innerText = 'مشاهدة معرض الصور 📸';
+            });
+        }
+    });
+    // --- نهاية الإضافة ---
+
 })();
 </script>
 
