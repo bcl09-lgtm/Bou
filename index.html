@@ -270,6 +270,129 @@ updateWeatherTheme();
     <strong id="road-title" style="color: #27ae60;">✅ حالة الطريق:</strong>
     <p id="road-text" style="margin: 5px 0 0; color: #2c3e50; font-size: 14px;">الطريق إلى غار جماعة مفتوح وجميل، نتمنى لكم رحلة ممتعة.</p>
 </div>
+    <div id="bouhamdan-slider-section" style="direction: ltr; position: relative; width: 100%; max-width: 900px; margin: 30px auto; font-family: 'Cairo', sans-serif;">
+    
+    <h2 style="text-align: center; color: #27ae60; margin-bottom: 15px; direction: rtl;">📸 جولة بصرية في بوحمدان</h2>
+
+    <div id="slider-main-container" 
+         style="position: relative; height: 450px; overflow: hidden; border-radius: 20px; box-shadow: 0 15px 45px rgba(0,0,0,0.2); background: #222; cursor: grab;"
+         onmousedown="this.style.cursor='grabbing'" 
+         onmouseup="this.style.cursor='grab'">
+
+        <div id="slides-wrapper" style="display: flex; width: 100%; height: 100%; transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);">
+            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white;">جاري تحميل صور بوحمدان...</div>
+        </div>
+
+        <button onclick="prevSlide()" style="position: absolute; top: 50%; left: 15px; transform: translateY(-50%); background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 10; font-size: 20px;">❮</button>
+        <button onclick="nextSlide()" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 10; font-size: 20px;">❯</button>
+
+        <div id="dots-container" style="position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 8px; z-index: 10;"></div>
+    </div>
+</div>
+
+<div id="bouhamdan-slider-section" style="direction: ltr; position: relative; width: 100%; max-width: 900px; margin: 30px auto; font-family: 'Cairo', sans-serif;">
+    <h2 style="text-align: center; color: #27ae60; margin-bottom: 15px; direction: rtl;">📸 جولة بصرية في بوحمدان</h2>
+
+    <div id="slider-main-container" 
+         style="position: relative; height: 450px; overflow: hidden; border-radius: 20px; box-shadow: 0 15px 45px rgba(0,0,0,0.2); background: #222; cursor: grab;">
+
+        <div id="slides-wrapper" style="display: flex; width: 100%; height: 100%; transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);">
+            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #777;">جاري انتظار صور المعرض...</div>
+        </div>
+
+        <button onclick="prevSlide()" style="position: absolute; top: 50%; left: 15px; transform: translateY(-50%); background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 10;">❮</button>
+        <button onclick="nextSlide()" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 10;">❯</button>
+
+        <div id="dots-container" style="position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 8px; z-index: 10;"></div>
+    </div>
+</div>
+
+<script>
+    let currentIdx = 0;
+    let slideInterval;
+    const SLIDE_DURATION = 4000; 
+
+    function syncPhotos() {
+        // البحث عن أي حاوية تحتوي على صور داخل قسم المعرض الخاص بك
+        // سنبحث في الصفحة كلها عن الصور التي تنتمي لمجلد photos
+        const allImages = document.getElementsByTagName('img');
+        const galleryImages = [];
+
+        for(let img of allImages) {
+            // إذا كانت الصورة تأتي من مجلد photos أو موجودة داخل قسم المعرض
+            if(img.src.includes('photos/') || img.closest('#controls') || img.closest('[id*="gallery"]')) {
+                galleryImages.push(img.src);
+            }
+        }
+
+        if (galleryImages.length === 0) return;
+
+        const wrapper = document.getElementById('slides-wrapper');
+        const dotsContainer = document.getElementById('dots-container');
+        
+        wrapper.innerHTML = "";
+        dotsContainer.innerHTML = "";
+
+        galleryImages.forEach((src, i) => {
+            const slideImg = document.createElement('img');
+            slideImg.src = src;
+            slideImg.style.cssText = "width: 100%; height: 100%; flex-shrink: 0; object-fit: cover; pointer-events: none;";
+            wrapper.appendChild(slideImg);
+
+            const dot = document.createElement('div');
+            dot.style.cssText = "width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: 0.3s; margin: 0 4px;";
+            dot.onclick = () => goToSlide(i);
+            dotsContainer.appendChild(dot);
+        });
+        updateDots();
+    }
+
+    function goToSlide(index) {
+        const wrapper = document.getElementById('slides-wrapper');
+        const total = wrapper.children.length;
+        if (total <= 1) return;
+        currentIdx = (index + total) % total;
+        wrapper.style.transform = `translateX(-${currentIdx * 100}%)`;
+        updateDots();
+    }
+
+    function nextSlide() { goToSlide(currentIdx + 1); }
+    function prevSlide() { goToSlide(currentIdx - 1); }
+
+    function updateDots() {
+        const dots = document.getElementById('dots-container').children;
+        for (let i = 0; i < dots.length; i++) {
+            dots[i].style.background = (i === currentIdx) ? "#27ae60" : "rgba(255,255,255,0.4)";
+            dots[i].style.width = (i === currentIdx) ? "25px" : "10px";
+            dots[i].style.borderRadius = (i === currentIdx) ? "5px" : "50%";
+        }
+    }
+
+    // تشغيل المحرك تلقائياً مع ميزة التوقف عند اللمس
+    function startAuto() { slideInterval = setInterval(nextSlide, SLIDE_DURATION); }
+    function stopAuto() { clearInterval(slideInterval); }
+
+    const container = document.getElementById('slider-main-container');
+    container.addEventListener('mouseenter', stopAuto);
+    container.addEventListener('mouseleave', startAuto);
+    container.addEventListener('touchstart', stopAuto);
+    container.addEventListener('touchend', startAuto);
+
+    // مراقبة الصفحة: إذا تم إضافة صور جديدة من التطبيق، سيحدث السلايدر نفسه
+    const observer = new MutationObserver(() => syncPhotos());
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    window.addEventListener('load', () => {
+        syncPhotos();
+        startAuto();
+        // تفعيل وظيفة جلب الصور صامتاً إذا كانت موجودة
+        if (typeof loadPhotos === 'function') loadPhotos();
+        if (typeof fetchPhotos === 'function') fetchPhotos();
+    });
+</script>
+    
+
+    
     
 
 
