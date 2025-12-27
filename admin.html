@@ -1,83 +1,103 @@
 <!DOCTYPE html>
-<html dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>رفع صور بلدية بوحمدان</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; text-align: center; background: #f4f7f6; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        button { background: #28a745; color: white; font-weight: bold; border: none; cursor: pointer; }
-        #status { color: blue; font-weight: bold; margin-top: 15px; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; text-align: center; background: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { color: #2e7d32; margin-bottom: 20px; font-size: 22px; }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 14px; }
+        button { background: #28a745; color: white; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; font-size: 16px; }
+        button:hover { background: #218838; }
+        #status { margin-top: 15px; font-weight: bold; font-size: 14px; }
+        .note { font-size: 11px; color: #777; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>تطبيق رفع الصور المباشر</h2>
-    <div style="margin: 10px 0; background: #eee; padding: 10px; border-radius: 5px;">
-    <input type="checkbox" id="isGhar">
-    <label for="isGhar">هل هذه الصورة خاصة بـ "غار جماعة"؟</label>
-</div>
-
+    <h2>📸 تطبيق رفع الصور</h2>
+    
     <input type="file" id="fileInput" accept="image/*">
-    <input type="password" id="token" placeholder="أدخل مفتاح GitHub (Token)">
+    
+    <input type="password" id="tokenInput" placeholder="أدخل مفتاح GitHub (Token)">
+    <p class="note">المفتاح يبدأ بـ ghp_ (تأكد من صلاحية repo)</p>
+
     <button onclick="uploadImage()">رفع الصورة الآن</button>
+    
     <div id="status"></div>
 </div>
 
 <script>
     async function uploadImage() {
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
-    if (!file) {
-        alert("يرجى اختيار صورة أولاً!");
-        return;
-    }
-
-    // 1. فحص هل المستخدم اختار "غار جماعة" أم لا
-    const isGhar = document.getElementById('isGhar').checked;
-    
-    // 2. تحديد المجلد (إذا كان صح يرسل لـ Ghar، وإذا لا يرسل للمجلد العام)
-    const folderPath = isGhar ? "Ghar/" : "";
-
-    const fileName = encodeURIComponent(file.name);
-    // 3. بناء الرابط الصحيح مع المجلد المختار
-    const uploadUrl = `https://api.github.com/repos/Bcl09-lgtm/bohamdan/contents/photos/${folderPath}${fileName}`;
-
-    const reader = new FileReader();
-    reader.onload = async () => {
-        const content = reader.result.split(',')[1];
+        const fileInput = document.getElementById('fileInput');
+        const tokenInput = document.getElementById('tokenInput');
+        const status = document.getElementById('status');
         
-        try {
-            const response = await fetch(uploadUrl, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': 'token YOUR_GITHUB_TOKEN', // ضع توكن الخاص بك هنا
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `رفع صورة جديدة إلى ${isGhar ? 'غار جماعة' : 'المعرض العام'}`,
-                    content: content
-                })
-            });
+        const file = fileInput.files[0];
+        const token = tokenInput.value.trim();
 
-            if (response.ok) {
-                alert(isGhar ? "تم الرفع بنجاح إلى مجلد غار جماعة! ✅" : "تم الرفع بنجاح إلى المعرض العام! ✅");
-                fileInput.value = ""; // تفريغ خانة الاختيار
-                document.getElementById('isGhar').checked = false; // إلغاء تحديد المربع
-            } else {
-                const errorData = await response.json();
-                alert("فشل الرفع: " + errorData.message);
-            }
-        } catch (error) {
-            alert("حدث خطأ في الاتصال: " + error.message);
+        // فحص المدخلات
+        if (!file) {
+            status.innerText = "⚠️ يرجى اختيار صورة أولاً!";
+            status.style.color = "orange";
+            return;
         }
-    };
-    reader.readAsDataURL(file);
-}
+        if (!token) {
+            status.innerText = "⚠️ يرجى إدخال المفتاح (Token)!";
+            status.style.color = "orange";
+            return;
+        }
 
+        // بناء اسم ملف فريد باستخدام الوقت لمنع تكرار الأسماء
+        const fileName = Date.now() + "-" + file.name;
+        // المسار الموحد لمجلد photos (تم حذف خيار Ghar)
+        const uploadUrl = `https://api.github.com/repos/Bcl09-lgtm/bouhamdan/contents/photos/${fileName}`;
+
+        status.innerText = "⏳ جاري الرفع... يرجى الانتظار";
+        status.style.color = "#333";
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            const content = reader.result.split(',')[1];
+            
+            try {
+                const response = await fetch(uploadUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`, // استخدام التوكن المدخل من المستخدم
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: "رفع صورة جديدة من لوحة التحكم",
+                        content: content
+                    })
+                });
+
+                if (response.ok) {
+                    status.innerText = "✅ تم الرفع بنجاح! ستظهر الصورة في السلايدر.";
+                    status.style.color = "green";
+                    fileInput.value = ""; // تفريغ الخانة
+                } else {
+                    const errorData = await response.json();
+                    if (errorData.message === "Bad credentials") {
+                        status.innerText = "❌ المفتاح غير صحيح أو تم إلغاؤه من GitHub.";
+                    } else {
+                        status.innerText = "❌ فشل الرفع: " + errorData.message;
+                    }
+                    status.style.color = "red";
+                }
+            } catch (error) {
+                status.innerText = "❌ حدث خطأ في الاتصال: " + error.message;
+                status.style.color = "red";
+            }
+        };
+        reader.readAsDataURL(file);
+    }
 </script>
+
 </body>
 </html>
+
