@@ -186,132 +186,114 @@ window.addEventListener('load', typeEffect);
     <p>جوهرة ولاية قالمة وجزء من تاريخها العريق</p>
 </header>
     
-<div id="prayer-and-dhikr-section">
+
+ <div class="pro-ticker-wrapper">
     <style>
-        .main-prayer-wrapper {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            max-width: 600px;
-            margin: 20px auto;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            direction: rtl;
+        :root {
+            --ticker-bg: #1b5e20; /* أخضر غامق ملكي */
+            --ticker-color: #ffffff;
+            --ticker-speed: 50s; /* سرعة هادئة جداً واحترافية */
         }
-        .prayer-title {
-            text-align: center;
-            color: #1b5e20;
-            font-size: 1.4rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        .prayer-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-        .prayer-card-item {
-            background: #f1f8e9;
-            padding: 15px 5px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid #e8f5e9;
-        }
-        .next-p { 
-            background: #2e7d32 !important; 
-            color: white !important;
-            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.4);
-        }
-        .next-p span { color: white !important; }
-        
-        .dhikr-bar {
-            background: #2e7d32;
-            padding: 12px 0;
-            border-radius: 10px;
+
+        .pro-ticker-wrapper {
+            width: 100%;
+            background: var(--ticker-bg);
+            padding: 15px 0;
             overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.1);
+            direction: ltr; /* اتجاه الحركة العام */
+            border-top: 2px solid #2e7d32;
+            border-bottom: 2px solid #2e7d32;
+        }
+
+        .ticker-scroll {
+            display: flex;
+            width: max-content;
+            animation: move-smooth var(--ticker-speed) linear infinite;
+        }
+
+        /* حاوية الأذكار لضمان التتابع */
+        .ticker-group {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .zekr-box {
+            color: var(--ticker-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            padding: 0 40px;
             white-space: nowrap;
-            position: relative;
+            display: flex;
+            align-items: center;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
-        .dhikr-text {
-            display: inline-block;
-            animation: marquee-dhikr 12s linear infinite; /* سرعة ممتازة */
-            color: #ffffff;
-            font-weight: bold;
-            font-size: 1.1rem;
-            padding-left: 100%;
+
+        /* الفاصل الاحترافي بين الأذكار */
+        .zekr-box::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: #ffca28; /* نقطة ذهبية فاصلة */
+            border-radius: 50%;
+            margin-right: 40px;
+            box-shadow: 0 0 10px #ffca28;
         }
-        @keyframes marquee-dhikr {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+
+        /* حركة من الشمال لليمين */
+        @keyframes move-smooth {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
         }
-        @media (max-width: 450px) { .prayer-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        /* تفاعل ذكي عند اللمس أو التوقف */
+        .pro-ticker-wrapper:hover .ticker-scroll {
+            animation-play-state: paused;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .zekr-box { font-size: 1rem; padding: 0 30px; }
+        }
     </style>
 
-    <div class="main-prayer-wrapper">
-        <div class="prayer-title">🕋 مواقيت الصلاة - بوحمدان</div>
-        <div id="prayers-list" class="prayer-grid">
-            </div>
-        <div class="dhikr-bar">
-            <div id="dhikr-content" class="dhikr-text">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، سُبْحَانَ اللَّهِ الْعَظِيمِ</div>
-        </div>
+    <div class="ticker-scroll" id="ticker-content">
+        <div class="ticker-group" id="group-1"></div>
+        <div class="ticker-group" id="group-2"></div>
     </div>
 
     <script>
-        // أذكار صحيحة من حصن المسلم
-        const azkar = [
+        const azkarHighQuality = [
             "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، سُبْحَانَ اللَّهِ الْعَظِيمِ",
-            "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
-            "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
-            "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
-            "الْحَمْدُ لِلَّهِ حَمْدًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ",
-            "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ"
+            "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ",
+            "أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ",
+            "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ",
+            "سُبْحَانَ اللَّهِ ، وَالْحَمْدُ لِلَّهِ ، وَلَا إِلَهَ إِلَّا اللَّهُ ، وَاللَّهُ أَكْبَرُ",
+            "اللَّهُمَّ صَلِّ وَسَلِّمْ وَبَارِكْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
+            "اللَّهُمَّ إِنَّكَ عَفُوٌّ كَرِيمٌ تُحِبُّ الْعَفْوَ فَاعْفُ عَنَّا"
         ];
 
-        function rotateAzkar() {
-            const el = document.getElementById('dhikr-content');
-            el.innerText = azkar[Math.floor(Math.random() * azkar.length)];
-        }
-
-        // دالة المعالجة لاستلام البيانات بدقة إحداثيات بوحمدان
-        function handlePrayerData(response) {
-            const timings = response.data.timings;
-            const prayerNames = [
-                {id: 'Fajr', n: 'الفجر'}, {id: 'Sunrise', n: 'الشروق'},
-                {id: 'Dhuhr', n: 'الظهر'}, {id: 'Asr', n: 'العصر'},
-                {id: 'Maghrib', n: 'المغرب'}, {id: 'Isha', n: 'العشاء'}
-            ];
+        function initTicker() {
+            const g1 = document.getElementById('group-1');
+            const g2 = document.getElementById('group-2');
             
-            const now = new Date();
-            const currentMin = now.getHours() * 60 + now.getMinutes();
-            let foundNext = false;
-            let output = '';
+            const content = azkarHighQuality.map(zekr => `
+                <div class="zekr-box">${zekr}</div>
+            `).join('');
 
-            prayerNames.forEach(p => {
-                const [h, m] = timings[p.id].split(':');
-                const pMin = parseInt(h) * 60 + parseInt(m);
-                let isNext = (!foundNext && pMin > currentMin);
-                if (isNext) foundNext = true;
-
-                output += `
-                <div class="prayer-card-item ${isNext ? 'next-p' : ''}">
-                    <span style="display:block; font-size:0.85rem; font-weight:600;">${p.n}</span>
-                    <span style="font-size:1.1rem; font-weight:bold;">${timings[p.id]}</span>
-                </div>`;
-            });
-            document.getElementById('prayers-list').innerHTML = output;
+            g1.innerHTML = content;
+            g2.innerHTML = content;
         }
 
-        // استخدام JSONP لضمان العمل في index.html مباشرة بدون حظر أمني
-        // الإحداثيات هنا لبوحمدان بالضبط: latitude=36.46 & longitude=7.28
-        const script = document.createElement('script');
-        script.src = `https://api.aladhan.com/v1/timings?latitude=36.4608&longitude=7.2882&method=3&callback=handlePrayerData`;
-        document.body.appendChild(script);
-
-        // تحديث الذكر كل دورة شريط
-        setInterval(rotateAzkar, 12000);
+        // بدء التشغيل
+        initTicker();
     </script>
 </div>
+
+
 
 
     
