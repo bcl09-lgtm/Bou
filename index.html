@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<script type="text/javascript">
+  // كود استقبال الزوار المحولين من صفحة 404
+  (function(l) {
+    if (l.search[1] === '/' ) {
+      var decoded = l.search.slice(1).split('&').map(function(s) { 
+        return s.replace(/~and~/g, '&')
+      }).join('?');
+      window.history.replaceState(null, null,
+          l.pathname.slice(0, -1) + decoded + l.hash
+      );
+    }
+  }(window.location))
+</script>
+
+    
     <title>بلدية بوحمدان - التاريخ، الثورة وجمال الطبيعة</title>
 
 <meta name="description" content="موقع متخصص في تاريخ بلدية بوحمدان بولاية قالمة، دورها في الثورة التحريرية، واستعراض لجمال طبيعتها وسد بوحمدان الشهير.">
